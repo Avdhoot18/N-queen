@@ -1,0 +1,37 @@
+class NQueens:
+    def __init__(self, N):
+        self.N = N
+        self.solutions = []
+
+    def solve(self):
+        board = [-1] * self.N  # Store queen positions
+        col = 0
+        while col >= 0:
+            board[col] += 1  # Move to the next row
+            if board[col] == self.N:
+                board[col] = -1  # Reset column
+                col -= 1  # Backtrack
+                continue
+
+            if self.is_valid(board, col):
+                if col == self.N - 1:
+                    self.solutions.append(board[:])  # Store valid solution
+                else:
+                    col += 1  # Move to next column
+
+    def is_valid(self, board, col):
+        for i in range(col):
+            if board[i] == board[col] or abs(board[i] - board[col]) == abs(i - col):
+                return False
+        return True
+
+    def display_solutions(self):
+        for solution in self.solutions:
+            for row in solution:
+                print("." * row + "Q" + "." * (self.N - row - 1))
+            print("\n" + "-" * self.N)
+
+# Run the solver
+nq = NQueens(4)
+nq.solve()
+nq.display_solutions()
