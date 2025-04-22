@@ -1,37 +1,81 @@
-class NQueens:
-    def __init__(self, N):
-        self.N = N
-        self.solutions = []
 
-    def solve(self):
-        board = [-1] * self.N  # Store queen positions
-        col = 0
-        while col >= 0:
-            board[col] += 1  # Move to the next row
-            if board[col] == self.N:
-                board[col] = -1  # Reset column
-                col -= 1  # Backtrack
-                continue
+import java.util.ArrayList;
+import java.util.List;
 
-            if self.is_valid(board, col):
-                if col == self.N - 1:
-                    self.solutions.append(board[:])  # Store valid solution
-                else:
-                    col += 1  # Move to next column
+public class NQueensPaperStyle {
 
-    def is_valid(self, board, col):
-        for i in range(col):
-            if board[i] == board[col] or abs(board[i] - board[col]) == abs(i - col):
-                return False
-        return True
+    public static void main(String[] args) {
+        int N = 4;
+        solveNQueens(N);
+    }
 
-    def display_solutions(self):
-        for solution in self.solutions:
-            for row in solution:
-                print("." * row + "Q" + "." * (self.N - row - 1))
-            print("\n" + "-" * self.N)
+    static void solveNQueens(int N) {
+        List<Integer> board = new ArrayList<>();  // stack-like structure
+        board.add(0);  // Start by placing the first queen at (0,0)
+        int totalSolutions = 0;
+        boolean finished = false;
 
-# Run the solver
-nq = NQueens(4)
-nq.solve()
-nq.display_solutions()
+        while (!finished) {
+            if (!isSafe(board, N)) {
+                int row = board.get(board.size() - 1);
+
+                if (row >= N) {
+                    // Backtrack
+                    do {
+                        if (board.size() > 1) {
+                            board.remove(board.size() - 1);  // remove last
+                            row = board.get(board.size() - 1);
+                            board.remove(board.size() - 1);  // remove again to try next row
+                            board.add(row + 1);  // try next row in previous column
+                        } else {
+                            // All possibilities checked
+                            finished = true;
+                            break;
+                        }
+                    } while (board.get(board.size() - 1) >= N);
+                } else {
+                    board.remove(board.size() - 1);
+                    board.add(row + 1);
+                }
+
+            } else {
+                if (board.size() == N) {
+                    totalSolutions++;
+                    printBoard(board, N);
+                    int row = board.get(board.size() - 1);
+                    board.remove(board.size() - 1);
+                    board.add(row + 1);  // try next row in the last column
+                } else {
+                    board.add(0);  // move to next column, start with row 0
+                }
+            }
+        }
+
+        System.out.println("Total number of solutions: " + totalSolutions);
+    }
+
+    static boolean isSafe(List<Integer> board, int N) {
+        int currentRow = board.get(board.size() - 1);
+        int currentCol = board.size() - 1;
+
+        if (currentRow >= N) return false;
+
+        for (int col = 0; col < currentCol; col++) {
+            int row = board.get(col);
+            if (row == currentRow || Math.abs(row - currentRow) == Math.abs(col - currentCol)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static void printBoard(List<Integer> board, int N) {
+        for (int row : board) {
+            for (int col = 0; col < N; col++) {
+                System.out.print(col == row ? "Q " : ". ");
+            }
+            System.out.println();
+        }
+        System.out.println("-".repeat(N * 2));
+    }
+}
